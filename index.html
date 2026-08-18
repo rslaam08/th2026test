@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>4합동 퍼즐</title>
+<style>
+:root{--bg:#f4f4f5;--panel:#fff;--text:#18181b;--muted:#71717a;--line:#d4d4d8;--accent:#4f6fe8;--cut:#c4c4c4;--danger:#d92d20}
+@media(prefers-color-scheme:dark){:root{--bg:#101113;--panel:#1a1c20;--text:#f4f4f5;--muted:#a1a1aa;--line:#3f3f46;--accent:#8299f7;--cut:#c4c4c4;--danger:#ff6b61}}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+body{padding:0}
+#app{width:min(900px,100%);margin:0 auto;padding:10px 12px 14px}
+.warning{text-align:center;font-size:11px;line-height:1.35;color:var(--muted);margin:0 0 9px}
+.warning b{color:var(--danger);font-weight:800}
+.warning2{text-align:center;font-size:11px;line-height:1.35;color:var(--muted);margin:-4px 0 9px}
+.warning2 b{color:var(--danger);font-weight:800}
+.row{display:flex;flex-wrap:wrap;justify-content:center;gap:7px}
+#chapters{margin-bottom:8px}
+#levels{margin-bottom:5px}
+button{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;height:38px;min-width:44px;padding:0 12px;font:600 13px/1 system-ui;cursor:pointer}
+#chapters button{min-width:92px}
+button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.hint{min-height:29px;display:flex;justify-content:center;align-items:flex-start;text-align:center;padding:2px 4px 5px;font-size:11px;line-height:1.35;color:var(--muted)}
+#boardWrap{width:100%;height:min(70vh,660px);min-height:390px;border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden;position:relative}
+canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+@media(max-width:600px){
+  #app{padding:8px}
+  .warning{font-size:10px;margin-bottom:7px}
+  .warning2{font-size:10px;margin-top:-3px;margin-bottom:7px}
+  .row{gap:5px}
+  button{height:34px;min-width:38px;padding:0 9px;font-size:12px}
+  #chapters button{min-width:78px}
+  .hint{min-height:36px;font-size:10px}
+  #boardWrap{height:calc(100svh - 165px);min-height:330px;border-radius:11px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="warning">해당 챕터를 완료했다는 생각이 들기 전까지 <b>절대로</b> 다음 챕터를 열지 마세요</div>
+  <div class="warning2">규칙은 <b>모든 곳에서</b> 동일합니다.</div>
+  <div id="chapters" class="row"></div>
+  <div id="levels" class="row"></div>
+  <div id="hint" class="hint"></div>
+  <div id="boardWrap"><canvas id="board"></canvas></div>
+</div>
+<script>
+const LEVELS={"1":{"format":"grid-4congruent-map","version":2,"rows":6,"cols":6,"cells":[[2,1],[2,2],[3,2],[4,2],[1,3],[2,3],[3,3],[3,4]],"blackEdges":[],"numbers":[],"redPoints":[]},"2":{"format":"grid-4congruent-map","version":2,"rows":6,"cols":6,"cells":[[1,1],[2,1],[4,1],[2,2],[3,2],[4,2],[1,3],[2,3],[3,3],[1,4],[3,4],[4,4]],"blackEdges":[],"numbers":[],"redPoints":[]},"3":{"format":"grid-4congruent-map","version":2,"rows":6,"cols":6,"cells":[[1,1],[2,1],[3,1],[4,1],[1,2],[2,2],[3,2],[4,2],[1,3],[2,3],[3,3],[4,3],[1,4],[2,4],[3,4],[4,4]],"blackEdges":["2,1|2,2","3,2|3,3","3,3|4,3","3,4|4,4"],"numbers":[],"redPoints":[]},"4":{"format":"grid-4congruent-map","version":2,"rows":8,"cols":8,"cells":[[2,1],[3,1],[4,1],[2,2],[3,2],[4,2],[5,2],[6,2],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[1,4],[2,4],[3,4],[4,4],[5,4],[6,4],[1,5],[2,5],[3,5],[4,5],[5,5],[3,6],[4,6],[5,6]],"blackEdges":["3,3|4,3","5,3|6,3","4,5|5,5","3,4|3,5","4,3|4,4","4,4|5,4","3,4|4,4","4,4|4,5","3,1|3,2"],"numbers":[],"redPoints":[]},"5":{"format":"grid-4congruent-map","version":2,"rows":8,"cols":8,"cells":[[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[1,2],[2,2],[3,2],[4,2],[5,2],[6,2],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[1,4],[2,4],[3,4],[4,4],[5,4],[6,4],[1,5],[2,5],[3,5],[4,5],[5,5],[6,5],[1,6],[2,6],[3,6],[4,6],[5,6],[6,6]],"blackEdges":["2,6|3,6","4,4|4,5","5,4|5,5","5,5|6,5","5,6|5,7","6,5|6,6","5,2|6,2","6,2|6,3","2,2|3,2","3,1|3,2","1,5|2,5","3,4|4,4","4,4|5,4","4,3|4,4","4,3|5,3","3,5|4,5"],"numbers":[],"redPoints":[]},"6":{"format":"grid-4congruent-map","version":2,"rows":8,"cols":8,"cells":[[2,1],[3,1],[4,1],[5,1],[1,2],[2,2],[3,2],[4,2],[5,2],[6,2],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[1,4],[2,4],[3,4],[4,4],[5,4],[6,4],[1,5],[2,5],[3,5],[4,5],[5,5],[6,5],[2,6],[3,6],[4,6],[5,6]],"blackEdges":["5,5|6,5","5,6|6,6","4,5|5,5","4,6|5,6"],"numbers":[],"redPoints":[]},"7":{"format":"grid-4congruent-map","version":2,"rows":6,"cols":6,"cells":[[1,1],[2,1],[3,1],[4,1],[1,2],[2,2],[3,2],[4,2],[1,3],[2,3],[3,3],[4,3],[1,4],[2,4],[3,4],[4,4]],"blackEdges":["1,2|2,2","4,2|4,3","4,4|5,4"],"numbers":[{"cell":"4,2","value":2},{"cell":"1,1","value":3},{"cell":"4,3","value":2},{"cell":"2,3","value":3}],"redPoints":[]},"8":{"format":"grid-4congruent-map","version":2,"rows":7,"cols":7,"cells":[[1,1],[2,1],[3,1],[4,1],[5,1],[1,2],[2,2],[3,2],[4,2],[5,2],[1,3],[2,3],[4,3],[5,3],[1,4],[2,4],[3,4],[4,4],[5,4],[1,5],[2,5],[3,5],[4,5],[5,5]],"blackEdges":[],"numbers":[{"cell":"4,3","value":2},{"cell":"4,4","value":2},{"cell":"1,5","value":3},{"cell":"2,5","value":3}],"redPoints":[]},"9":{"format":"grid-4congruent-map","version":2,"rows":8,"cols":8,"cells":[[2,1],[3,1],[4,1],[5,1],[1,2],[2,2],[3,2],[4,2],[5,2],[6,2],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[1,4],[2,4],[3,4],[4,4],[5,4],[6,4],[1,5],[2,5],[3,5],[4,5],[5,5],[6,5],[2,6],[3,6],[4,6],[5,6]],"blackEdges":["6,2|6,3","3,2|3,3","2,5|2,6","5,6|6,6"],"numbers":[{"cell":"4,3","value":3},{"cell":"5,4","value":1},{"cell":"2,5","value":2}],"redPoints":[]},"10":{"format":"grid-4congruent-map","version":2,"rows":9,"cols":9,"cells":[[2,1],[3,1],[4,1],[5,1],[2,2],[3,2],[4,2],[5,2],[6,2],[7,2],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[7,3],[1,4],[2,4],[3,4],[5,4],[6,4],[7,4],[1,5],[2,5],[3,5],[4,5],[5,5],[6,5],[7,5],[1,6],[2,6],[3,6],[4,6],[5,6],[6,6],[3,7],[4,7],[5,7],[6,7]],"blackEdges":["6,4|6,5","5,1|5,2","3,5|4,5","2,4|3,4","4,7|4,8","6,5|7,5"],"numbers":[{"cell":"3,2","value":0},{"cell":"4,3","value":3},{"cell":"7,5","value":3}],"redPoints":[]},"11":{"format":"grid-4congruent-map","version":2,"rows":9,"cols":9,"cells":[[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],[1,2],[2,2],[3,2],[4,2],[5,2],[6,2],[7,2],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[7,3],[1,4],[2,4],[3,4],[5,4],[6,4],[7,4],[1,5],[2,5],[3,5],[4,5],[5,5],[6,5],[7,5],[1,6],[2,6],[3,6],[4,6],[5,6],[6,6],[7,6],[1,7],[2,7],[3,7],[4,7],[5,7],[6,7],[7,7]],"blackEdges":[],"numbers":[{"cell":"7,7","value":3},{"cell":"5,2","value":3},{"cell":"4,7","value":1},{"cell":"6,3","value":1},{"cell":"5,3","value":1},{"cell":"1,3","value":2},{"cell":"2,7","value":1},{"cell":"5,4","value":2}],"redPoints":[]},"12":{"format":"grid-4congruent-map","version":2,"rows":6,"cols":6,"cells":[[1,1],[2,1],[3,1],[4,1],[1,2],[2,2],[3,2],[4,2],[1,3],[2,3],[3,3],[4,3],[1,4],[2,4],[3,4],[4,4]],"blackEdges":[],"numbers":[{"cell":"2,1","value":2},{"cell":"2,4","value":2}],"redPoints":[[2,2],[4,2],[2,4],[4,4]]},"13":{"format":"grid-4congruent-map","version":2,"rows":9,"cols":9,"cells":[[4,1],[2,2],[3,2],[4,2],[5,2],[6,2],[2,3],[3,3],[5,3],[6,3],[1,4],[2,4],[6,4],[7,4],[2,5],[3,5],[5,5],[6,5],[2,6],[3,6],[4,6],[5,6],[6,6],[4,7]],"blackEdges":[],"numbers":[{"cell":"3,2","value":1},{"cell":"4,2","value":1}],"redPoints":[[3,2],[6,7]]},"14":{"format":"grid-4congruent-map","version":2,"rows":8,"cols":6,"cells":[[1,1],[2,1],[3,1],[4,1],[1,2],[2,2],[3,2],[4,2],[1,3],[2,3],[3,3],[4,3],[1,4],[2,4],[3,4],[4,4],[1,5],[2,5],[3,5],[4,5],[1,6],[2,6],[3,6],[4,6]],"blackEdges":["2,6|2,7"],"numbers":[],"redPoints":[[2,2],[4,6]]},"15":{"format":"grid-4congruent-map","version":2,"rows":8,"cols":8,"cells":[[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[1,2],[2,2],[3,2],[4,2],[5,2],[6,2],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[1,4],[2,4],[3,4],[4,4],[5,4],[6,4],[1,5],[2,5],[3,5],[4,5],[5,5],[6,5],[1,6],[2,6],[3,6],[4,6],[5,6],[6,6]],"blackEdges":["3,2|4,2","2,3|3,3","3,2|3,3"],"numbers":[{"cell":"2,2","value":2},{"cell":"4,5","value":3},{"cell":"6,1","value":2}],"redPoints":[[2,2],[6,2],[2,6],[6,6]]},"16":{"format":"grid-4congruent-map","version":2,"rows":9,"cols":9,"cells":[[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],[1,2],[2,2],[3,2],[4,2],[5,2],[6,2],[7,2],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[7,3],[1,4],[2,4],[3,4],[5,4],[6,4],[7,4],[1,5],[2,5],[3,5],[4,5],[5,5],[6,5],[7,5],[1,6],[2,6],[3,6],[4,6],[5,6],[6,6],[7,6],[1,7],[2,7],[3,7],[4,7],[5,7],[6,7],[7,7]],"blackEdges":["6,2|7,2","7,2|7,3","7,3|7,4","6,3|6,4","5,3|6,3","6,5|6,6","5,6|6,6","5,7|6,7","6,7|7,7","7,5|7,6","3,5|3,6","3,6|4,6","2,5|2,6","2,6|2,7","3,7|4,7","2,3|2,4","2,2|3,2","3,2|4,2","3,3|3,4","3,3|4,3","6,4|7,4","5,6|5,7","2,5|3,5","4,2|4,3"],"numbers":[],"redPoints":[[6,1],[1,2],[8,6],[2,8]]},"17":{"format":"grid-4congruent-map","version":2,"rows":6,"cols":6,"cells":[[1,1],[2,1],[3,1],[4,1],[1,2],[2,2],[3,2],[4,2],[1,3],[2,3],[3,3],[4,3],[1,4],[2,4],[3,4],[4,4]],"blackEdges":["2,2|3,2","3,2|4,2","2,4|3,4","3,4|4,4","3,2|3,3","3,3|3,4"],"numbers":[],"redPoints":[]},"18":{"format":"grid-4congruent-map","version":2,"rows":6,"cols":6,"cells":[[1,1],[2,1],[3,1],[4,1],[1,2],[2,2],[3,2],[4,2],[1,3],[2,3],[3,3],[4,3],[1,4],[2,4],[3,4],[4,4]],"blackEdges":[],"numbers":[{"cell":"2,2","value":3},{"cell":"3,2","value":2},{"cell":"3,3","value":1},{"cell":"4,4","value":2}],"redPoints":[]},"19":{"format":"grid-4congruent-map","version":2,"rows":6,"cols":6,"cells":[[1,1],[2,1],[3,1],[4,1],[1,2],[2,2],[3,2],[4,2],[1,3],[2,3],[3,3],[4,3],[1,4],[2,4],[3,4],[4,4]],"blackEdges":[],"numbers":[],"redPoints":[[4,1],[1,3],[3,3],[5,3],[2,5]]}};
+const CHAPTERS=[
+  {name:'챕터 1',levels:[1,2,3,4,5,6],hint:'합동인 네 조각으로 나누세요.'},
+  {name:'챕터 2',levels:[7,8,9,10,11],hint:'퍼즐에 익숙하시다면 규칙을 어디선가 보셨을 수도 있습니다.'},
+  {name:'챕터 3',levels:[12,13,14,15,16],hint:'제가 두 번째로 좋아하는 색은 빨간색입니다. 왜냐고요? 글쎄요.'},
+  {name:'챕터 4',levels:[17,18,19],hint:'당신이 알고 있는 것들이 진실이라 믿고 계시지는 않습니까?'}
+];
+let chapter=0, level=1;
+const cuts=new Map();
+const canvas=document.getElementById('board');
+const wrap=document.getElementById('boardWrap');
+const ctx=canvas.getContext('2d');
+let geom=null;
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+function ck(x,y){return x+','+y}
+function pc(s){return s.split(',').map(Number)}
+function ek(x1,y1,x2,y2){if(x1>x2||(x1===x2&&y1>y2))return `${x2},${y2}|${x1},${y1}`;return `${x1},${y1}|${x2},${y2}`;}
+function ee(s){return s.split('|').map(pc)}
+function renderControls(){
+  const ch=document.getElementById('chapters');ch.innerHTML='';
+  CHAPTERS.forEach((c,i)=>{const b=document.createElement('button');b.textContent=c.name;b.className=i===chapter?'active':'';b.onclick=()=>{chapter=i;if(!c.levels.includes(level))level=c.levels[0];renderControls();draw();};ch.appendChild(b);});
+  const ls=document.getElementById('levels');ls.innerHTML='';
+  CHAPTERS[chapter].levels.forEach(n=>{const b=document.createElement('button');b.textContent=n;b.className=n===level?'active':'';b.onclick=()=>{level=n;renderControls();draw();};ls.appendChild(b);});
+  document.getElementById('hint').textContent=CHAPTERS[chapter].hint;
+}
+function setupCanvas(){
+  const r=wrap.getBoundingClientRect(),dpr=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+  canvas.width=Math.max(1,Math.round(r.width*dpr));canvas.height=Math.max(1,Math.round(r.height*dpr));
+  ctx.setTransform(dpr,0,0,dpr,0,0);return {w:r.width,h:r.height};
+}
+function buildGeom(d,w,h){
+  const xs=[],ys=[];d.cells.forEach(([x,y])=>{xs.push(x,x+1);ys.push(y,y+1)});(d.redPoints||[]).forEach(p=>{const [x,y]=Array.isArray(p)?p:pc(p);xs.push(x);ys.push(y)});
+  const minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
+  const bw=maxx-minx,bh=maxy-miny,pad=34;
+  const cell=Math.max(18,Math.min((w-2*pad)/bw,(h-2*pad)/bh,86));
+  const ox=(w-bw*cell)/2-minx*cell,oy=(h-bh*cell)/2-miny*cell;
+  return {w,h,cell,ox,oy,minx,maxx,miny,maxy};
+}
+function sx(x){return geom.ox+x*geom.cell} function sy(y){return geom.oy+y*geom.cell}
+function line(x1,y1,x2,y2,color,width){ctx.beginPath();ctx.moveTo(sx(x1),sy(y1));ctx.lineTo(sx(x2),sy(y2));ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.stroke();}
+function draw(){
+  const d=LEVELS[level],size=setupCanvas();geom=buildGeom(d,size.w,size.h);ctx.clearRect(0,0,size.w,size.h);
+  const selected=new Set(d.cells.map(([x,y])=>ck(x,y)));
+  const panel=css('--panel'),grid=css('--line'),text=css('--text'),cut=css('--cut');
+  ctx.fillStyle=panel;ctx.fillRect(0,0,size.w,size.h);
+  // selected cell fill
+  ctx.fillStyle=panel;for(const [x,y] of d.cells)ctx.fillRect(sx(x),sy(y),geom.cell,geom.cell);
+  const all=new Map();function collect(x1,y1,x2,y2){const k=ek(x1,y1,x2,y2);if(!all.has(k))all.set(k,[x1,y1,x2,y2]);}
+  d.cells.forEach(([x,y])=>{collect(x,y,x+1,y);collect(x+1,y,x+1,y+1);collect(x,y+1,x+1,y+1);collect(x,y,x,y+1);});
+  for(const e of all.values())line(...e,grid,1);
+  const dirs=[[-1,0,(x,y)=>[x,y,x,y+1]],[1,0,(x,y)=>[x+1,y,x+1,y+1]],[0,-1,(x,y)=>[x,y,x+1,y]],[0,1,(x,y)=>[x,y+1,x+1,y+1]]];
+  d.cells.forEach(([x,y])=>dirs.forEach(([dx,dy,f])=>{if(!selected.has(ck(x+dx,y+dy)))line(...f(x,y),text,2.5)}));
+  const internal=new Map();d.cells.forEach(([x,y])=>{if(selected.has(ck(x+1,y)))internal.set(ek(x+1,y,x+1,y+1),[x+1,y,x+1,y+1]);if(selected.has(ck(x,y+1)))internal.set(ek(x,y+1,x+1,y+1),[x,y+1,x+1,y+1]);});
+  const cs=cuts.get(level)||new Set();cuts.set(level,cs);for(const k of cs){const e=internal.get(k);if(e)line(...e,cut,6)}
+  for(const s of d.blackEdges||[]){const [[x1,y1],[x2,y2]]=ee(s);line(x1,y1,x2,y2,'#ffffff',5)}
+  // numbers
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`700 ${Math.max(18,geom.cell*.42)}px system-ui`;
+  for(const n of d.numbers||[]){const [x,y]=typeof n.cell==='string'?pc(n.cell):[n.x,n.y];const X=sx(x+.5),Y=sy(y+.52);ctx.lineWidth=4;ctx.strokeStyle=panel;ctx.strokeText(String(n.value),X,Y);ctx.fillStyle=text;ctx.fillText(String(n.value),X,Y);}
+  // red points
+  for(const rp of d.redPoints||[]){const [x,y]=Array.isArray(rp)?rp:pc(rp);ctx.beginPath();ctx.arc(sx(x),sy(y),Math.max(5,geom.cell*.105),0,Math.PI*2);ctx.fillStyle='#e33b32';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=panel;ctx.stroke();}
+  geom.internal=internal;
+}
+function distToSeg(px,py,x1,y1,x2,y2){const vx=x2-x1,vy=y2-y1,wx=px-x1,wy=py-y1,c1=vx*wx+vy*wy;if(c1<=0)return Math.hypot(px-x1,py-y1);const c2=vx*vx+vy*vy;if(c2<=c1)return Math.hypot(px-x2,py-y2);const t=c1/c2;return Math.hypot(px-(x1+t*vx),py-(y1+t*vy));}
+canvas.addEventListener('pointerdown',e=>{if(!geom)return;const r=canvas.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;let best=null,bd=Infinity;for(const [k,[x1,y1,x2,y2]] of geom.internal){const d=distToSeg(px,py,sx(x1),sy(y1),sx(x2),sy(y2));if(d<bd){bd=d;best=k}}if(best&&bd<=Math.max(12,geom.cell*.20)){const s=cuts.get(level)||new Set();if(s.has(best))s.delete(best);else s.add(best);cuts.set(level,s);draw();}});
+new ResizeObserver(draw).observe(wrap);window.matchMedia('(prefers-color-scheme:dark)').addEventListener?.('change',draw);
+renderControls();draw();
+</script>
+</body>
+</html>
