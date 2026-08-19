@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>4합동 퍼즐</title>
 <style>
-:root{--bg:#f4f4f5;--panel:#fff;--text:#18181b;--muted:#71717a;--line:#d4d4d8;--accent:#4f6fe8;--cut:#c4c4c4;--danger:#d92d20}
-@media(prefers-color-scheme:dark){:root{--bg:#101113;--panel:#1a1c20;--text:#f4f4f5;--muted:#a1a1aa;--line:#3f3f46;--accent:#8299f7;--cut:#c4c4c4;--danger:#ff6b61}}
+:root{--bg:#f4f4f5;--panel:#fff;--text:#18181b;--muted:#71717a;--line:#d4d4d8;--accent:#4f6fe8;--cut:#2e9b5f;--danger:#d92d20}
+@media(prefers-color-scheme:dark){:root{--bg:#101113;--panel:#1a1c20;--text:#f4f4f5;--muted:#a1a1aa;--line:#3f3f46;--accent:#8299f7;--cut:#2e9b5f;--danger:#ff6b61}}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
 body{padding:0}
@@ -99,8 +99,9 @@ function draw(){
   const dirs=[[-1,0,(x,y)=>[x,y,x,y+1]],[1,0,(x,y)=>[x+1,y,x+1,y+1]],[0,-1,(x,y)=>[x,y,x+1,y]],[0,1,(x,y)=>[x,y+1,x+1,y+1]]];
   d.cells.forEach(([x,y])=>dirs.forEach(([dx,dy,f])=>{if(!selected.has(ck(x+dx,y+dy)))line(...f(x,y),text,2.5)}));
   const internal=new Map();d.cells.forEach(([x,y])=>{if(selected.has(ck(x+1,y)))internal.set(ek(x+1,y,x+1,y+1),[x+1,y,x+1,y+1]);if(selected.has(ck(x,y+1)))internal.set(ek(x,y+1,x+1,y+1),[x,y+1,x+1,y+1]);});
-  const cs=cuts.get(level)||new Set();cuts.set(level,cs);for(const k of cs){const e=internal.get(k);if(e)line(...e,cut,6)}
-  for(const s of d.blackEdges||[]){const [[x1,y1],[x2,y2]]=ee(s);line(x1,y1,x2,y2,'#ffffff',5)}
+  const cs=cuts.get(level)||new Set();cuts.set(level,cs);
+  for(const s of d.blackEdges||[]){const [[x1,y1],[x2,y2]]=ee(s);line(x1,y1,x2,y2,'#2f9ee5',3.5)}
+  for(const k of cs){const e=internal.get(k);if(e)line(...e,cut,6)}
   // numbers
   ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`700 ${Math.max(18,geom.cell*.42)}px system-ui`;
   for(const n of d.numbers||[]){const [x,y]=typeof n.cell==='string'?pc(n.cell):[n.x,n.y];const X=sx(x+.5),Y=sy(y+.52);ctx.lineWidth=4;ctx.strokeStyle=panel;ctx.strokeText(String(n.value),X,Y);ctx.fillStyle=text;ctx.fillText(String(n.value),X,Y);}
