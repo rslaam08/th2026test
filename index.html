@@ -22,7 +22,7 @@ body{padding:0}
 button{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;height:38px;min-width:44px;padding:0 12px;font:600 13px/1 system-ui;cursor:pointer}
 #chapters button{min-width:92px}
 button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.hint{min-height:29px;display:flex;justify-content:center;align-items:flex-start;text-align:center;padding:2px 4px 5px;font-size:11px;line-height:1.35;color:var(--muted)}
+.hint{white-space:pre-line;min-height:29px;display:flex;justify-content:center;align-items:flex-start;text-align:center;padding:2px 4px 5px;font-size:11px;line-height:1.35;color:var(--muted)}
 #boardWrap{width:100%;height:min(70vh,660px);min-height:390px;border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden;position:relative}
 canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
 @media(max-width:600px){
@@ -53,8 +53,8 @@ const LEVELS={"1":{"format":"grid-4congruent-map","version":2,"rows":6,"cols":6,
 const CHAPTERS=[
   {name:'챕터 1',levels:[1,2,3,4,5,6],hint:'터치를 통해 초록색 선으로 도형을 분할하세요.'},
   {name:'챕터 2',levels:[7,8,9,10,11],hint:'퍼즐에 익숙하시다면 규칙을 어디선가 보셨을 수도 있습니다.'},
-  {name:'챕터 3',levels:[12,13,14,15,16],hint:'제가 두 번째로 좋아하는 색은 빨간색입니다. 왜냐고요? 글쎄요.'},
-  {name:'챕터 4',levels:[17,18,19,20],hint:'당신이 알고 있는 것들이 진실이라 믿고 계시지는 않습니까?'}
+  {name:'챕터 3',levels:[12,13,14,15,16],hint:'빨간색은 위험의 상징이죠. 이 퍼즐북에서도 그럴지는 모르겠지만요.'},
+  {name:'챕터 4',levels:[17,18,19,20],hint:'당신이 알고 있는 것들이 진실이라 믿고 계시지는 않으십니까?\n지금부터 본게임을 시작합니다.\n추천 bgm: https://www.youtube.com/watch?v=fvRv9yZ9F70'}
 ];
 let chapter=0, level=1;
 const cuts=new Map();
